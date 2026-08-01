@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }} · Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Adaptive Intrusion Response</p>
+  <h1>{{ app_name }}</h1>
+  <p class="lede">
+    Detect simulated attacks, explain threats with a small ML model, and apply
+    adaptive response actions inside a safe lab environment.
+  </p>
+  <div class="cta-row">
+    <a class="btn" href="/docs">Open API</a>
+    <a class="btn btn-ghost" href="/health">Check Health</a>
+  </div>
+  <p class="meta">
+    Simulation mode:
+    <strong>{% if simulation_mode %}ON{% else %}OFF{% endif %}</strong>
+  </p>
+</section>
+{% endblock %}

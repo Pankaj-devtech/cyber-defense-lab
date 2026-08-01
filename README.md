@@ -8,9 +8,9 @@ Detect simulated attacks, classify them with a small scikit-learn model, explain
 
 - Python 3.12 + FastAPI + Jinja2/HTMX-ready templates
 - SQLite
+- JWT auth + RBAC + audit log
 - scikit-learn (tiny classifier — later milestone)
 - Docker Compose
-- JWT auth + RBAC (later milestone)
 
 ## Quick start (Docker)
 
@@ -36,6 +36,31 @@ copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
+## Auth (M1)
+
+Roles (ascending privilege): `viewer` → `analyst` → `admin`.
+
+| Endpoint | Access | Notes |
+|---|---|---|
+| `POST /auth/register` | public* | Body: `{email, password, role?}`. Cannot self-assign `admin`. |
+| `POST /auth/login` | public | OAuth2 password form (`username`=email). Returns JWT. |
+| `GET /auth/me` | authenticated | Current user profile. |
+| `GET /audit` | admin+ | Recent audit events (login, register, seed, …). |
+
+\* Registration respects `ALLOW_REGISTRATION` in `.env`.
+
+**Dev demo admin** (seeded when the users table is empty, non-production only):
+
+- Email: `admin@example.com`
+- Password: `admin123`
+
+Example:
+
+```bash
+curl -X POST http://localhost:8000/auth/login \
+  -d "username=admin@example.com&password=admin123"
+```
+
 ## Tests
 
 ```bash
@@ -44,11 +69,11 @@ pytest -q
 
 ## Current milestone
 
-**M0 — Bootstrap:** runnable app shell, health endpoint, Docker Compose, SQLite init, home page.
+**M1 — Auth:** JWT login/register, role hierarchy, audit log API, demo admin seed.
 
 ## Roadmap (next)
 
-1. Auth (JWT + roles + audit)
+1. ~~Auth (JWT + roles + audit)~~
 2. Attack simulator + detection rules
 3. Incidents + risk score + MITRE mapping
 4. sklearn classifier + explanations

@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from app import __version__
 from app.config import get_settings
 from app.db import SessionLocal, init_db
-from app.routers import audit, auth
+from app.routers import audit, auth, lab
 from app.seed import seed_demo_admin
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -41,6 +41,7 @@ def create_app() -> FastAPI:
 
     application.include_router(auth.router)
     application.include_router(audit.router)
+    application.include_router(lab.router)
 
     @application.get("/health")
     def health() -> dict[str, str | bool]:

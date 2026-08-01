@@ -9,6 +9,7 @@ Detect simulated attacks, classify them with a small scikit-learn model, explain
 - Python 3.12 + FastAPI + Jinja2/HTMX-ready templates
 - SQLite
 - JWT auth + RBAC + audit log
+- Attack simulator + rule-based detection
 - scikit-learn (tiny classifier — later milestone)
 - Docker Compose
 
@@ -54,11 +55,30 @@ Roles (ascending privilege): `viewer` → `analyst` → `admin`.
 - Email: `admin@example.com`
 - Password: `admin123`
 
-Example:
-
 ```bash
 curl -X POST http://localhost:8000/auth/login \
   -d "username=admin@example.com&password=admin123"
+```
+
+## Lab simulation (M2)
+
+All traffic is **synthetic** — nothing leaves the sandbox.
+
+| Endpoint | Access | Notes |
+|---|---|---|
+| `GET /rules` | authenticated | Built-in detection rules (R001–R004). |
+| `POST /simulate` | analyst+ | Body: `{scenario, count?, seed?}`. Generates events + runs rules. |
+| `GET /events` | authenticated | Recent simulated events. |
+| `GET /detections` | authenticated | Rule hits with optional MITRE technique IDs. |
+
+Scenarios: `brute_force`, `port_scan`, `malware_beacon`, `sql_injection`, `mixed`, `benign`.
+
+```bash
+TOKEN=... # from /auth/login
+curl -X POST http://localhost:8000/simulate \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"scenario\":\"brute_force\",\"count\":8,\"seed\":42}"
 ```
 
 ## Tests
@@ -69,12 +89,12 @@ pytest -q
 
 ## Current milestone
 
-**M1 — Auth:** JWT login/register, role hierarchy, audit log API, demo admin seed.
+**M2 — Attack simulator + detection rules:** synthetic scenarios, rule engine, events/detections APIs.
 
 ## Roadmap (next)
 
 1. ~~Auth (JWT + roles + audit)~~
-2. Attack simulator + detection rules
+2. ~~Attack simulator + detection rules~~
 3. Incidents + risk score + MITRE mapping
 4. sklearn classifier + explanations
 5. Adaptive response engine
